@@ -1,12 +1,11 @@
-FROM alpine/git AS clone
-ARG REPO_URL=https://github.com/PEERS21/nginx.git
-ARG REPO_BRANCH=develop
-WORKDIR /tmp
-RUN git clone --branch ${REPO_BRANCH} ${REPO_URL} repo
+FROM nginx:alpine
 
-FROM nginx:stable-alpine
-COPY --from=clone /tmp/repo/docker/nginx/sites-enabled/peers.conf /etc/nginx/sites-enabled/peers.conf
-COPY --from=clone /tmp/repo/docker/nginx/nginx.conf /etc/nginx/nginx.conf
+RUN rm /etc/nginx/conf.d/default.conf
 
-EXPOSE 80
+RUN mkdir -p /etc/nginx/sites-enabled
+COPY nginx.conf /etc/nginx/nginx.conf
+COPY sites-enabled/ /etc/nginx/sites-enabled/
+
+EXPOSE 80 443
+
 CMD ["nginx", "-g", "daemon off;"]
